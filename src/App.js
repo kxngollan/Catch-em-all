@@ -1,5 +1,5 @@
 // App.js
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PokemonGet from "./components/PokemonGet";
 import GetPokePhotos from "./components/GetPokePhotos";
 import PokemonCard from "./components/PokemonCard";
@@ -21,7 +21,7 @@ function App() {
     }
   };
 
-  function shuffle(array) {
+  const shuffle = (array) => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -31,15 +31,19 @@ function App() {
       ];
     }
     return shuffledArray;
-  }
+  };
+
+  const mixedPokemon = useCallback(() => {
+    return shuffle(pokemon);
+  }, [pokemon]);
 
   useEffect(() => {
-    const shuffledPokemon = shuffle(pokemon);
+    const shuffledPokemon = mixedPokemon();
     setPokemon(shuffledPokemon);
-    if (selected.length === 20) {
+    if (selected.length === 20 || score === 20) {
       setPlaying(false);
     }
-  }, [selected, playing]);
+  }, [selected, playing, score, mixedPokemon]);
 
   useEffect(() => {
     if (playing) {
@@ -65,6 +69,7 @@ function App() {
   const reset = () => {
     setSelected([]);
     setScore(0);
+    setTime(0);
     setPlaying(true);
   };
 
