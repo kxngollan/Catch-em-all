@@ -1,25 +1,89 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import { useEffect, useState } from "react";
+import PokemonGet from "./components/PokemonGet";
+import GetPokePhotos from "./components/GetPokePhotos";
+import PokemonCard from "./components/PokemonCard";
+import "./App.css";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [pokemon, setPokemon] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [score, setScore] = useState(0);
+  const [playing, setPlaying] = useState(true);
+
+  const addToSelected = (poke) => {
+    if (selected.map((p) => p.name).includes(poke.name)) {
+      setPlaying(false);
+    } else {
+      setSelected([...selected, poke]);
+      setScore(score + 1);
+    }
+  };
+
+  function shuffle(array) {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
+    }
+    return shuffledArray;
+  }
+
+  useEffect(() => {
+    const shuffledPokemon = shuffle(pokemon);
+    setPokemon(shuffledPokemon);
+  }, [selected]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const pokeNames = await PokemonGet();
+        const pokePhotos = await GetPokePhotos(pokeNames);
+        setPokemon(pokePhotos);
+      } catch (error) {
+        console.error("Error fetching Pokemon data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const reset = () => {
+    setSelected([]);
+    setScore(0);
+    setPlaying(true);
+  };
+
+  if (playing) {
+    return (
+      <div className="App">
+        <div className="title">
+          <h2>Catch em all</h2>
+          <h3>Score: {score}/20</h3>
+        </div>
+        <div className="game-screen">
+          <PokemonCard pokemon={pokemon} addToSelected={addToSelected} />
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="App">
+        <div className="title">
+          <h2>Catch em all</h2>
+        </div>
+        <div className="game-over">
+          <h1>Game over!</h1>
+          <h3>Score: {score}/20</h3>
+          <button type="button" onClick={reset}>
+            Play again
+          </button>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
