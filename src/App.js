@@ -9,6 +9,7 @@ function App() {
   const [pokemon, setPokemon] = useState([]);
   const [selected, setSelected] = useState([]);
   const [score, setScore] = useState(0);
+  const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(true);
 
   const addToSelected = (poke) => {
@@ -35,7 +36,18 @@ function App() {
   useEffect(() => {
     const shuffledPokemon = shuffle(pokemon);
     setPokemon(shuffledPokemon);
-  }, [selected]);
+    if (selected.length === 20) {
+      setPlaying(false);
+    }
+  }, [selected, playing]);
+
+  useEffect(() => {
+    if (playing) {
+      setTimeout(() => {
+        setTime(time + 1);
+      }, 1000);
+    }
+  }, [time, playing]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,7 +73,9 @@ function App() {
       <div className="App">
         <div className="title">
           <h2>Catch em all</h2>
-          <h3>Score: {score}/20</h3>
+          <h3>
+            Score: {score}/20 Time:{time}
+          </h3>
         </div>
         <div className="game-screen">
           <PokemonCard pokemon={pokemon} addToSelected={addToSelected} />
@@ -75,8 +89,9 @@ function App() {
           <h2>Catch em all</h2>
         </div>
         <div className="game-over">
-          <h1>Game over!</h1>
+          {score === 20 ? <h1>You win!</h1> : <h1>Game over!</h1>}
           <h3>Score: {score}/20</h3>
+          <h3>Time: {time}</h3>
           <button type="button" onClick={reset}>
             Play again
           </button>
