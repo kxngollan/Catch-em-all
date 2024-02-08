@@ -12,15 +12,6 @@ function App() {
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(true);
 
-  const addToSelected = (poke) => {
-    if (selected.map((p) => p.name).includes(poke.name)) {
-      setPlaying(false);
-    } else {
-      setSelected([...selected, poke]);
-      setScore(score + 1);
-    }
-  };
-
   const shuffle = (array) => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -37,13 +28,21 @@ function App() {
     return shuffle(pokemon);
   }, [pokemon]);
 
+  const addToSelected = (poke) => {
+    if (selected.map((p) => p.name).includes(poke.name)) {
+      setPlaying(false);
+    } else {
+      setSelected([...selected, poke]);
+      setScore(score + 1);
+      setPokemon(mixedPokemon());
+    }
+  };
+
   useEffect(() => {
-    const shuffledPokemon = mixedPokemon();
-    setPokemon(shuffledPokemon);
     if (selected.length === 20 || score === 20) {
       setPlaying(false);
     }
-  }, [selected, playing, score, mixedPokemon]);
+  }, [playing, selected, score]);
 
   useEffect(() => {
     if (playing) {
@@ -64,6 +63,7 @@ function App() {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const reset = () => {
