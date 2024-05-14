@@ -10,7 +10,7 @@ function App() {
   const [selected, setSelected] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
 
   const shuffle = (array) => {
     const shuffledArray = [...array];
@@ -54,6 +54,7 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setPlaying(false)
       try {
         const pokeNames = await PokemonGet();
         const pokePhotos = await GetPokePhotos(pokeNames);
@@ -61,6 +62,7 @@ function App() {
       } catch (error) {
         console.error("Error fetching Pokemon data:", error);
       }
+      setPlaying(true)
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
